@@ -1,12 +1,12 @@
 # RateMyTeacher - 教师评价平台 | 教师评价平台
 
-<div align="center">
-  <img src="https://via.placeholder.com/800x400?text=RateMyTeacher" alt="RateMyTeacher Logo" width="800"/>
-  <br>
-  <p>
-    <b>RateMyTeacher</b> - 一个让学生评价教师的平台
-  </p>
-</div>
+   <div align="center">
+     ![RateMyTeacher Logo](frontend/src/assets/)
+     <br>
+     <p>
+       <b>RateMyTeacher</b> - 一个让学生评价教师的平台
+     </p>
+   </div>
 
 ## 项目简介 | Project Introduction
 
