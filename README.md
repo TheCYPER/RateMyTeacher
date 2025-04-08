@@ -1,7 +1,7 @@
 # RateMyTeacher - 教师评价平台 | 教师评价平台
 
    <div align="center">
-     <img src="./logo.png" alt="RateMyTeacher Logo" width="800"/>
+     <img src="./logo.png" alt="RateMyTeacher Logo" width="250"/>
     <br>
      <p>
        <b>RateMyTeacher</b> - 一个让学生评价教师的平台
@@ -157,5 +157,5 @@ RateMyTeacher/
 ---
 
 <div align="center">
-  <p>Made with ❤️ by TheCYPER</p>
+  <p>Made with ❤️ by TheCYPER & Sugerbaby</p>
 </div>
