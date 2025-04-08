@@ -1,7 +1,7 @@
 # RateMyTeacher - 教师评价平台 | 教师评价平台
 
    <div align="center">
-     ![RateMyTeacher Logo](frontend/src/assets/)
+     ![RateMyTeacher Logo](logo.png)
      <br>
      <p>
        <b>RateMyTeacher</b> - 一个让学生评价教师的平台
