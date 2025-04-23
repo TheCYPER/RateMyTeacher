@@ -2,7 +2,7 @@ from flask import request, jsonify
 from flask_login import login_required
 from backend.app import db
 from backend.app.models import Review
-from .teacher_routes import check_and_add_teacher
+from app.routes.teacher_routes import check_and_add_teacher
 
 def init_review_routes(app):
     # 添加评论
