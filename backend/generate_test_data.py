@@ -73,19 +73,22 @@ def main():
         User.query.delete()
         db.session.commit()
         
-        # 生成测试数据
-        print("生成测试数据...")
+        # 生成并添加用户数据
+        print("生成用户数据...")
         users = generate_users()
-        teachers = generate_teachers()
-        reviews = generate_reviews(users, teachers)
-        
-        # 添加到数据库
-        print("添加到数据库...")
         db.session.add_all(users)
-        db.session.add_all(teachers)
-        db.session.add_all(reviews)
+        db.session.commit()
         
-        # 提交更改
+        # 生成并添加教师数据
+        print("生成教师数据...")
+        teachers = generate_teachers()
+        db.session.add_all(teachers)
+        db.session.commit()
+        
+        # 生成并添加评价数据
+        print("生成评价数据...")
+        reviews = generate_reviews(users, teachers)
+        db.session.add_all(reviews)
         db.session.commit()
         
         print(f"成功添加 {len(users)} 个用户")
