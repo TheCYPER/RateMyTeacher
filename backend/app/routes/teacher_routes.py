@@ -1,8 +1,41 @@
 from flask import request, jsonify
 from flask_login import login_required
-from backend.app import db
-from backend.app.models import Teacher, Review
+from app import db
+from app.models import Teacher, Review
 from sqlalchemy import func
+
+def check_and_add_teacher(teacher_name, department):
+    # 获取未关联教师的评价数量
+    review_count = Review.query.filter_by(
+        teacher_name=teacher_name,
+        department=department,
+        teacher_id=None
+    ).count()
+    
+    # 如果评价数达到5个，自动添加教师
+    if review_count >= 5:
+        # 检查教师是否已存在
+        existing_teacher = Teacher.query.filter_by(name=teacher_name, department=department).first()
+        if existing_teacher:
+            # 关联未关联的评价
+            Review.query.filter_by(teacher_name=teacher_name, department=department, teacher_id=None).update(
+                {Review.teacher_id: existing_teacher.id}
+            )
+            db.session.commit()
+            return existing_teacher
+        else:
+            # 创建新教师
+            new_teacher = Teacher(name=teacher_name, department=department)
+            db.session.add(new_teacher)
+            db.session.commit()
+            
+            # 关联未关联的评价
+            Review.query.filter_by(teacher_name=teacher_name, department=department, teacher_id=None).update(
+                {Review.teacher_id: new_teacher.id}
+            )
+            db.session.commit()
+            return new_teacher
+    return None
 
 def init_teacher_routes(app):
     # 获取教师列表
@@ -61,40 +94,6 @@ def init_teacher_routes(app):
         db.session.commit()
         
         return jsonify({'message': '教师添加成功', 'id': new_teacher.id}), 201
-
-    # 检查并自动添加教师的函数
-    def check_and_add_teacher(teacher_name, department):
-        # 获取未关联教师的评价数量
-        review_count = Review.query.filter_by(
-            teacher_name=teacher_name,
-            department=department,
-            teacher_id=None
-        ).count()
-        
-        # 如果评价数达到5个，自动添加教师
-        if review_count >= 5:
-            # 检查教师是否已存在
-            existing_teacher = Teacher.query.filter_by(name=teacher_name, department=department).first()
-            if existing_teacher:
-                # 关联未关联的评价
-                Review.query.filter_by(teacher_name=teacher_name, department=department, teacher_id=None).update(
-                    {Review.teacher_id: existing_teacher.id}
-                )
-                db.session.commit()
-                return existing_teacher
-            else:
-                # 创建新教师
-                new_teacher = Teacher(name=teacher_name, department=department)
-                db.session.add(new_teacher)
-                db.session.commit()
-                
-                # 关联未关联的评价
-                Review.query.filter_by(teacher_name=teacher_name, department=department, teacher_id=None).update(
-                    {Review.teacher_id: new_teacher.id}
-                )
-                db.session.commit()
-                return new_teacher
-        return None
 
     # 获取教师详情
     @app.route('/api/teachers/<int:teacher_id>', methods=['GET'])  

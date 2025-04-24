@@ -23,6 +23,7 @@ var/
 # 虚拟环境
 venv/
 ENV/
+.venv/
 
 # 数据库
 *.db

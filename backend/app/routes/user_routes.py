@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from flask_login import login_user, login_required
-from backend.app import db
-from backend.app.models import User
+from app import db
+from app.models import User
 
 def init_user_routes(app):
     # 注册接口
