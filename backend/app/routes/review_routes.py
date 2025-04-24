@@ -90,3 +90,19 @@ def init_review_routes(app):
             'likes': review.likes,
             'dislikes': review.dislikes
         }) 
+    
+    # 获取按照点赞数量排序的前十条结论
+    @app.route('/api/reviews/top', methods=['GET'])
+    def get_top_reviews():
+        reviews = Review.query.order_by(Review.likes.desc()).limit(10).all()
+        return jsonify([{
+            'id': r.id,
+            'score': r.score,
+            'comment': r.comment, 
+            'created_at': r.created_at,
+            'teacher_name': r.teacher_name,
+            'department': r.department,
+            'likes': r.likes,
+            'dislikes': r.dislikes
+        } for r in reviews])
+    
