@@ -41,7 +41,7 @@ export default {
     async fetchTopReviews() {
       try {
         this.loading = true
-        const response = await axios.get('http://localhost:5000/api/reviews/top')
+        const response = await axios.get('http://localhost:8000/api/reviews/top')
         this.reviews = response.data
         this.error = null
       } catch (err) {
