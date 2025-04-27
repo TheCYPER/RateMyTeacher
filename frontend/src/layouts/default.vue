@@ -67,11 +67,11 @@
       </v-list>
     </v-navigation-drawer>
     
-    <v-main>
-      <router-view />
-    </v-main>
+  <v-main>
+    <router-view />
+  </v-main>
 
-    <AppFooter />
+  <AppFooter />
   </v-app>
 </template>
 

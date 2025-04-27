@@ -1,6 +1,5 @@
 <template>
   <div class="top-reviews">
-    <h2>热门评价</h2>
     <div v-if="loading" class="loading">加载中...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else class="reviews-list">
@@ -98,12 +97,16 @@ export default {
 
 .review-header h3 {
   margin: 0;
+  font-size: 1.2rem;
   color: #333;
 }
 
 .department {
+  font-size: 0.9rem;
   color: #666;
-  font-size: 0.9em;
+  background-color: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 .review-content {
@@ -111,23 +114,23 @@ export default {
 }
 
 .score {
-  color: #f39c12;
   font-weight: bold;
+  color: #009688;
   margin-bottom: 8px;
 }
 
 .comment {
-  color: #444;
-  line-height: 1.5;
   margin: 0;
+  line-height: 1.5;
+  color: #444;
 }
 
 .review-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 0.9rem;
   color: #666;
-  font-size: 0.9em;
 }
 
 .interactions {
@@ -139,15 +142,17 @@ export default {
   cursor: pointer;
 }
 
-.loading {
+.date {
+  font-size: 0.8rem;
+}
+
+.loading, .error {
   text-align: center;
-  color: #666;
   padding: 20px;
+  color: #666;
 }
 
 .error {
-  color: #e74c3c;
-  text-align: center;
-  padding: 20px;
+  color: #f44336;
 }
 </style> 

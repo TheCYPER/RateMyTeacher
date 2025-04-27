@@ -26,8 +26,8 @@
                   <v-card-title class="text-h5">
                     热门教师
                   </v-card-title>
-                  <v-card-text>
-                    <!-- 内容区域 -->
+                  <v-card-text class="scrollable-content">
+                    <TopReviews />
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -36,8 +36,8 @@
                   <v-card-title class="text-h5">
                     最新评价
                   </v-card-title>
-                  <v-card-text>
-                    <!-- 内容区域 -->
+                  <v-card-text class="scrollable-content">
+                    <LatestReviews />
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -50,11 +50,23 @@
 </template>
 
 <script setup>
-// Component logic here if needed
+import TopReviews from '@/components/TopReviews.vue';
+import LatestReviews from '@/components/LatestReviews.vue';
 </script>
 
 <style scoped>
 .fill-height {
   min-height: 100vh;
+}
+
+.scrollable-content {
+  height: calc(900px - 64px); /* 卡片高度减去标题高度 */
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollable-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 </style>
