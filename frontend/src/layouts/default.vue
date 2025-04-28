@@ -76,14 +76,38 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import AppFooter from '@/components/AppFooter.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 // 全局状态变量 - 用户登录状态
-const isLoggedIn = ref(false); // 设置为false显示登录按钮，true显示用户名
-const username = ref('John Doe'); // 占位符用户名
+const isLoggedIn = ref(false);
+const username = ref('');
 const searchQuery = ref('');
 const drawer = ref(false);
+
+// 初始化登录状态
+onMounted(() => {
+  // 从 localStorage 读取登录状态
+  isLoggedIn.value = localStorage.getItem('isLoggedIn') === 'true';
+  username.value = localStorage.getItem('username') || '';
+
+  // 监听登录状态变化
+  window.addEventListener('loginStateChanged', handleLoginStateChange);
+});
+
+// 清理事件监听
+onUnmounted(() => {
+  window.removeEventListener('loginStateChanged', handleLoginStateChange);
+});
+
+// 处理登录状态变化
+const handleLoginStateChange = (event) => {
+  isLoggedIn.value = event.detail.isLoggedIn;
+  username.value = event.detail.username;
+};
 
 // 响应式设计 - 检测是否为移动设备
 const isMobile = computed(() => {
@@ -92,21 +116,15 @@ const isMobile = computed(() => {
 
 // 导航函数
 const goToLogin = () => {
-  // 跳转到登录页面的函数
-  console.log('Navigate to login page');
-  // 实际项目中可以使用 router.push('/login')
+  router.push('/register');
 };
 
 const goToProfile = () => {
-  // 跳转到用户资料页面的函数
-  console.log('Navigate to profile page');
-  // 实际项目中可以使用 router.push('/profile')
+  router.push('/profile');
 };
 
 const handleSearch = () => {
-  // 处理搜索的函数
   console.log('Search for:', searchQuery.value);
-  // 实际项目中可以实现搜索逻辑
 };
 </script>
 

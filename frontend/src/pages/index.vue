@@ -24,7 +24,7 @@
               <v-col cols="12" md="6">
                 <v-card class="mx-auto" height="900" elevation="4" rounded="lg">
                   <v-card-title class="text-h5">
-                    热门教师
+                    Famous teachers
                   </v-card-title>
                   <v-card-text class="scrollable-content">
                     <TopReviews />
@@ -34,7 +34,7 @@
               <v-col cols="12" md="6">
                 <v-card class="mx-auto" height="900" elevation="4" rounded="lg">
                   <v-card-title class="text-h5">
-                    最新评价
+                    Latest reviews
                   </v-card-title>
                   <v-card-text class="scrollable-content">
                     <LatestReviews />
