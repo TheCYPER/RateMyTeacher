@@ -14,8 +14,16 @@
         </div>
         <div class="review-footer">
           <div class="interactions">
-            <span class="likes">👍 {{ review.likes }}</span>
-            <span class="dislikes">👎 {{ review.dislikes }}</span>
+            <span 
+              class="likes" 
+              :class="{ 'active': userReactions[review.id] === 'like' }"
+              @click="handleLike(review)"
+            >👍 {{ review.likes }}</span>
+            <span 
+              class="dislikes" 
+              :class="{ 'active': userReactions[review.id] === 'dislike' }"
+              @click="handleDislike(review)"
+            >👎 {{ review.dislikes }}</span>
           </div>
           <div class="date">{{ formatDate(review.created_at) }}</div>
         </div>
@@ -26,21 +34,27 @@
 
 <script>
 import axios from 'axios'
+import { useAuth } from '@/composables/useAuth'
 
 export default {
   name: 'TopReviews',
+  setup() {
+    const { isLoggedIn, checkLoginStatus } = useAuth()
+    return { isLoggedIn, checkLoginStatus }
+  },
   data() {
     return {
       reviews: [],
       loading: true,
-      error: null
+      error: null,
+      userReactions: {} // 存储用户对每条评论的反应状态
     }
   },
   methods: {
     async fetchTopReviews() {
       try {
         this.loading = true
-        const response = await axios.get('http://localhost:8000/api/reviews/top')
+        const response = await axios.get('/api/reviews/top')
         this.reviews = response.data
         this.error = null
       } catch (err) {
@@ -59,6 +73,82 @@ export default {
         hour: '2-digit',
         minute: '2-digit'
       })
+    },
+    async handleLike(review) {
+      try {
+        // 检查用户是否已登录
+        if (!this.isLoggedIn) {
+          alert('请先登录后再点赞');
+          return;
+        }
+        
+        // 验证登录状态
+        const isValid = await this.checkLoginStatus();
+        if (!isValid) {
+          alert('登录已过期，请重新登录');
+          return;
+        }
+        
+        if (this.userReactions[review.id] === 'like') {
+          // 如果已经点赞，则取消点赞
+          review.likes--
+          this.userReactions[review.id] = null
+        } else {
+          // 如果已经点踩，则取消点踩并点赞
+          if (this.userReactions[review.id] === 'dislike') {
+            review.dislikes--
+          }
+          const response = await axios.post(`/api/reviews/${review.id}/like`)
+          review.likes = response.data.likes
+          this.userReactions[review.id] = 'like'
+        }
+      } catch (err) {
+        console.error('点赞失败:', err)
+        if (err.response && err.response.status === 401) {
+          alert('请先登录后再点赞');
+        } else {
+          // 恢复原状态
+          this.fetchTopReviews()
+        }
+      }
+    },
+    async handleDislike(review) {
+      try {
+        // 检查用户是否已登录
+        if (!this.isLoggedIn) {
+          alert('请先登录后再点踩');
+          return;
+        }
+        
+        // 验证登录状态
+        const isValid = await this.checkLoginStatus();
+        if (!isValid) {
+          alert('登录已过期，请重新登录');
+          return;
+        }
+        
+        if (this.userReactions[review.id] === 'dislike') {
+          // 如果已经点踩，则取消点踩
+          review.dislikes--
+          this.userReactions[review.id] = null
+        } else {
+          // 如果已经点赞，则取消点赞并点踩
+          if (this.userReactions[review.id] === 'like') {
+            review.likes--
+          }
+          const response = await axios.post(`/api/reviews/${review.id}/dislike`)
+          review.dislikes = response.data.dislikes
+          this.userReactions[review.id] = 'dislike'
+        }
+      } catch (err) {
+        console.error('点踩失败:', err)
+        if (err.response && err.response.status === 401) {
+          alert('请先登录后再点踩');
+        } else {
+          // 恢复原状态
+          this.fetchTopReviews()
+        }
+      }
     }
   },
   mounted() {
@@ -140,6 +230,23 @@ export default {
 
 .likes, .dislikes {
   cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.likes:hover, .dislikes:hover {
+  background-color: #f5f5f5;
+}
+
+.likes.active {
+  color: #4CAF50;
+  background-color: #E8F5E9;
+}
+
+.dislikes.active {
+  color: #F44336;
+  background-color: #FFEBEE;
 }
 
 .date {

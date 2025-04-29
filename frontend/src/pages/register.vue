@@ -89,7 +89,7 @@ const loading = ref(false);
 
 const handleRegister = async () => {
   // 表单验证
-  if (!username.value || !email.value || !password.value || !confirmPassword.value) {
+  if (!username.value || !password.value || !confirmPassword.value) {
     alert('请填写所有必填字段');
     return;
   }
@@ -101,14 +101,14 @@ const handleRegister = async () => {
 
   try {
     loading.value = true;
-    const response = await axios.post('http://localhost:8000/register', {
+    const response = await axios.post('/register', {
       username: username.value,
-      email: email.value,
-      password: password.value
+      password: password.value,
+      school: '未知学校' // 默认值
     });
 
     if (response.data.message === '注册成功') {
-      alert('注册成功！');
+      alert('注册成功！请登录');
       router.push('/login');
     }
   } catch (error) {
