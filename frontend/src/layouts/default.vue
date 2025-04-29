@@ -12,6 +12,7 @@
         <div class="hidden-sm-and-down ml-4">
           <v-btn text to="/" class="mr-2">Home</v-btn>
           <v-btn text to="/teachers" class="mr-2">List of Teachers</v-btn>
+          <v-btn text to="/comments" class="mr-2">Write Comments</v-btn>
         </div>
       </div>
       
@@ -31,7 +32,7 @@
       ></v-text-field>
       
       <!-- 用户信息/登录按钮 -->
-      <div v-if="isLoggedIn" class="mr-4">
+      <div v-if="isLoggedIn && isValidLogin" class="mr-4">
         <v-btn text @click="goToProfile">
           <v-icon left>mdi-account</v-icon>
           {{ username }}
@@ -79,20 +80,22 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import AppFooter from '@/components/AppFooter.vue';
 import { useRouter } from 'vue-router';
+import { useAuth } from '@/composables/useAuth';
 
 const router = useRouter();
+const { isLoggedIn, username, checkLoginStatus } = useAuth();
 
-// 全局状态变量 - 用户登录状态
-const isLoggedIn = ref(false);
-const username = ref('');
+// 全局状态变量
 const searchQuery = ref('');
 const drawer = ref(false);
+const isValidLogin = ref(false);
 
 // 初始化登录状态
-onMounted(() => {
-  // 从 localStorage 读取登录状态
-  isLoggedIn.value = localStorage.getItem('isLoggedIn') === 'true';
-  username.value = localStorage.getItem('username') || '';
+onMounted(async () => {
+  // 如果用户已登录，验证登录状态
+  if (isLoggedIn.value) {
+    isValidLogin.value = await checkLoginStatus();
+  }
 
   // 监听登录状态变化
   window.addEventListener('loginStateChanged', handleLoginStateChange);
@@ -104,9 +107,12 @@ onUnmounted(() => {
 });
 
 // 处理登录状态变化
-const handleLoginStateChange = (event) => {
-  isLoggedIn.value = event.detail.isLoggedIn;
-  username.value = event.detail.username;
+const handleLoginStateChange = async (event) => {
+  if (event.detail.isLoggedIn) {
+    isValidLogin.value = await checkLoginStatus();
+  } else {
+    isValidLogin.value = false;
+  }
 };
 
 // 响应式设计 - 检测是否为移动设备
@@ -116,7 +122,7 @@ const isMobile = computed(() => {
 
 // 导航函数
 const goToLogin = () => {
-  router.push('/register');
+  router.push('/login');
 };
 
 const goToProfile = () => {

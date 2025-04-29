@@ -33,8 +33,8 @@
               size="large"
               min-width="200"
               elevation="2"
-              :loading="loading"
-              :disabled="loading"
+              :loading="isLoading"
+              :disabled="isLoading"
               @click="handleLogin"
             >
               Login
@@ -58,14 +58,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { useAuth } from '@/composables/useAuth';
 
 const router = useRouter();
 const username = ref('');
 const password = ref('');
-const loading = ref(false);
+const { login, isLoading, checkLoginStatus } = useAuth();
 
 const handleLogin = async () => {
   // 表单验证
@@ -75,40 +75,30 @@ const handleLogin = async () => {
   }
 
   try {
-    loading.value = true;
-    const response = await axios.post('http://localhost:8000/login', {
-      username: username.value,
-      password: password.value
-    });
-
-    if (response.data.message === '登录成功') {
-      // 更新全局登录状态
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', username.value);
-      
-      // 触发全局状态更新
-      window.dispatchEvent(new CustomEvent('loginStateChanged', {
-        detail: {
-          isLoggedIn: true,
-          username: username.value
-        }
-      }));
-
+    const success = await login(username.value, password.value);
+    
+    if (success) {
       alert('登录成功！');
       router.push('/');
+    } else {
+      alert('登录失败，请检查用户名和密码');
     }
   } catch (error) {
-    if (error.response) {
-      console.error('Login error:', error.response);
-      alert(`登录失败：${error.response.data.error || '请重试'}\n错误详情：${JSON.stringify(error.response.data, null, 2)}`);
-    } else {
-      console.error('Network error:', error);
-      alert('登录失败，请检查网络连接');
-    }
-  } finally {
-    loading.value = false;
+    console.error('Login error:', error);
+    alert('登录失败，请重试');
   }
 };
+
+// 页面加载时检查登录状态
+onMounted(async () => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  if (isLoggedIn) {
+    const isValid = await checkLoginStatus();
+    if (isValid) {
+      router.push('/');
+    }
+  }
+});
 
 const goToRegister = () => {
   router.push('/register');
