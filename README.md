@@ -1,4 +1,4 @@
-# RateMyTeacher - 教师评价平台 | 教师评价平台
+# RateMyTeacher - 教师评价平台
 
    <div align="center">
      <img src="./logo.png" alt="RateMyTeacher Logo" width="250"/>
@@ -41,26 +41,27 @@ RateMyTeacher is a teacher rating platform based on Flask and Vue.js, allowing s
 ## 技术栈 | Tech Stack
 
 ### 后端 | Backend
-- Python 3.8+ | Python 3.8+
-- Flask | Flask
-- SQLite | SQLite
-- SQLAlchemy | SQLAlchemy
-- Flask-Login | Flask-Login
-- Ollama (AI 模型) | Ollama (AI Model)
+- Python 3.8+
+- Flask
+- SQLite
+- SQLAlchemy
+- Flask-Login
+- Ollama
 
 ### 前端 | Frontend
-- Vue.js | Vue.js
-- Vue Router | Vue Router
-- Vuex | Vuex
-- Axios | Axios
-- Element UI | Element UI
+- Vue.js
+- Vue Router
+- Vuex
+- Axios
+- Element UI
+- Vuetify
 
 ## 安装说明 | Installation
 
 ### 前提条件 | Prerequisites
-- Python 3.8+ | Python 3.8+
-- Node.js 14+ | Node.js 14+
-- Ollama (用于 AI 功能) | Ollama (for AI features)
+- Python 3.8+
+- Node.js 14+
+- Ollama with [huihui_ai/gemma3-abliterated:1b](https://huggingface.co/huihui-ai/gemma-3-1b-it-abliterated)
 
 ### 后端安装 | Backend Installation
 
