@@ -121,3 +121,21 @@ def init_review_routes(app):
             'dislikes': r.dislikes
         } for r in reviews])
     
+    # 取消点赞评论
+    @app.route('/api/reviews/<int:review_id>/unlike', methods=['POST'])
+    @login_required
+    def unlike_review(review_id):
+        review = Review.query.get_or_404(review_id)
+        review.likes -= 1
+        db.session.commit()
+        return jsonify({'message': '取消点赞成功', 'likes': review.likes})
+    
+    # 取消踩评论
+    @app.route('/api/reviews/<int:review_id>/undislike', methods=['POST'])
+    @login_required
+    def undislike_review(review_id):
+        review = Review.query.get_or_404(review_id)
+        review.dislikes -= 1
+        db.session.commit()
+        return jsonify({'message': '取消踩成功', 'dislikes': review.dislikes})
+    

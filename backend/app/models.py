@@ -6,9 +6,25 @@ from datetime import datetime
 class User(UserMixin, db.Model):
     __tablename__ = 'user_data'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
     school = db.Column(db.String(64), nullable=False)
+    ratings = db.relationship('Review', backref='user', lazy=True)
+    
+    # 添加点赞和点踩关系
+    liked_ratings = db.relationship(
+        'Review',
+        secondary='user_liked_ratings',
+        backref=db.backref('liked_by', lazy='dynamic'),
+        lazy='dynamic'
+    )
+    
+    disliked_ratings = db.relationship(
+        'Review',
+        secondary='user_disliked_ratings',
+        backref=db.backref('disliked_by', lazy='dynamic'),
+        lazy='dynamic'
+    )
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -40,3 +56,15 @@ class Review(db.Model):
         """将评价关联到教师"""
         self.teacher_id = teacher.id
         db.session.commit()
+
+# 点赞关联表
+user_liked_ratings = db.Table('user_liked_ratings',
+    db.Column('user_id', db.Integer, db.ForeignKey('user_data.id'), primary_key=True),
+    db.Column('review_id', db.Integer, db.ForeignKey('reviews.id'), primary_key=True)
+)
+
+# 点踩关联表
+user_disliked_ratings = db.Table('user_disliked_ratings',
+    db.Column('user_id', db.Integer, db.ForeignKey('user_data.id'), primary_key=True),
+    db.Column('review_id', db.Integer, db.ForeignKey('reviews.id'), primary_key=True)
+)
