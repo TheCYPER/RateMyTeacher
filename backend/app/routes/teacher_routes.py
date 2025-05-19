@@ -1,7 +1,7 @@
-from flask import request, jsonify
-from flask_login import login_required
+from flask import request, jsonify, session
+from flask_login import login_required, current_user
 from app import db
-from app.models import Teacher, Review
+from app.models import Teacher, Review, User
 from sqlalchemy import func
 
 def check_and_add_teacher(teacher_name, department):
@@ -45,7 +45,8 @@ def init_teacher_routes(app):
         return jsonify([{
             'id': teacher.id,
             'name': teacher.name,
-            'department': teacher.department
+            'department': teacher.department,
+            'review_count': len(teacher.ratings)
         } for teacher in teachers])
     
     # 教师评价统计接口
@@ -96,15 +97,38 @@ def init_teacher_routes(app):
         return jsonify({'message': '教师添加成功', 'id': new_teacher.id}), 201
 
     # 获取教师详情
-    @app.route('/api/teachers/<int:teacher_id>', methods=['GET'])  
+    @app.route('/api/teachers/<int:teacher_id>', methods=['GET'])
     def get_teacher(teacher_id):
         teacher = Teacher.query.get_or_404(teacher_id)
         return jsonify({
             'id': teacher.id,
             'name': teacher.name,
-            'department': teacher.department
+            'department': teacher.department,
+            'review_count': len(teacher.ratings)
         })
-    
+
+    # 获取教师评价列表
+    @app.route('/api/teachers/<int:teacher_id>/reviews', methods=['GET'])
+    def get_teacher_reviews(teacher_id):
+        teacher = Teacher.query.get_or_404(teacher_id)
+        reviews = []
+        for rating in teacher.ratings:
+            reviews.append({
+                'id': rating.id,
+                'content': rating.comment,
+                'rating': rating.score,
+                'created_at': rating.created_at.isoformat(),
+                'reviewer_name': rating.user.username,
+                'likes': rating.likes,
+                'dislikes': rating.dislikes,
+                'user_liked': False,
+                'user_disliked': False
+            })
+        
+        # 按创建时间倒序排序
+        reviews.sort(key=lambda x: x['created_at'], reverse=True)
+        return jsonify(reviews)
+
     # 搜索教师
     @app.route('/api/search', methods=['GET'])
     def search():
@@ -117,5 +141,6 @@ def init_teacher_routes(app):
         return jsonify([{
             'id': t.id,
             'name': t.name,
-            'department': t.department
+            'department': t.department,
+            'review_count': len(t.ratings)
         } for t in teachers]) 

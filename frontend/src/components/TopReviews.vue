@@ -91,12 +91,14 @@ export default {
         
         if (this.userReactions[review.id] === 'like') {
           // 如果已经点赞，则取消点赞
-          review.likes--
+          const response = await axios.post(`/api/reviews/${review.id}/unlike`)
+          review.likes = response.data.likes
           this.userReactions[review.id] = null
         } else {
           // 如果已经点踩，则取消点踩并点赞
           if (this.userReactions[review.id] === 'dislike') {
-            review.dislikes--
+            const undislikeResponse = await axios.post(`/api/reviews/${review.id}/undislike`)
+            review.dislikes = undislikeResponse.data.dislikes
           }
           const response = await axios.post(`/api/reviews/${review.id}/like`)
           review.likes = response.data.likes
@@ -129,12 +131,14 @@ export default {
         
         if (this.userReactions[review.id] === 'dislike') {
           // 如果已经点踩，则取消点踩
-          review.dislikes--
+          const response = await axios.post(`/api/reviews/${review.id}/undislike`)
+          review.dislikes = response.data.dislikes
           this.userReactions[review.id] = null
         } else {
           // 如果已经点赞，则取消点赞并点踩
           if (this.userReactions[review.id] === 'like') {
-            review.likes--
+            const unlikeResponse = await axios.post(`/api/reviews/${review.id}/unlike`)
+            review.likes = unlikeResponse.data.likes
           }
           const response = await axios.post(`/api/reviews/${review.id}/dislike`)
           review.dislikes = response.data.dislikes

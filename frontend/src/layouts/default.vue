@@ -29,6 +29,7 @@
         class="mx-4"
         style="max-width: 300px;"
         @keyup.enter="handleSearch"
+        @click:append="handleSearch"
       ></v-text-field>
       
       <!-- 用户信息/登录按钮 -->
@@ -130,7 +131,12 @@ const goToProfile = () => {
 };
 
 const handleSearch = () => {
-  console.log('Search for:', searchQuery.value);
+  if (searchQuery.value.trim()) {
+    router.push({
+      path: '/search',
+      query: { q: searchQuery.value.trim() }
+    })
+  }
 };
 </script>
 
