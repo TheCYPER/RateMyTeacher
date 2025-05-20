@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from flask_login import login_user, login_required
+from flask_login import login_user, login_required, current_user
 from app import db
 from app.models import User
 
@@ -60,4 +60,15 @@ def init_user_routes(app):
             user.username = data['username']
         
         db.session.commit()
-        return jsonify({'message': '更新成功'}) 
+        return jsonify({'message': '更新成功'})
+
+    # 通过用户名获取用户信息
+    @app.route('/api/user/by-username/<username>', methods=['GET'])
+    @login_required
+    def get_user_by_username(username):
+        user = User.query.filter_by(username=username).first_or_404()
+        return jsonify({
+            'id': user.id,
+            'username': user.username,
+            'school': user.school
+        }) 
