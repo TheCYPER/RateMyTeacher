@@ -13,7 +13,7 @@ def create_app():
     # 配置 CORS 支持凭证
     CORS(app, supports_credentials=True, origins=[
         'http://localhost:3000',
-        'https://www.example.com'
+        'https://ratemyteacher-t929.onrender.com'
     ])
     
     db.init_app(app)

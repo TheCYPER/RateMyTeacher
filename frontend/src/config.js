@@ -1,1 +1,1 @@
-export const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:8000'
+export const API_BASE_URL = 'https://ratemyteacher-t929.onrender.com'
