@@ -11,7 +11,10 @@ def create_app():
     app.config.from_object('config.Config')
     
     # 配置 CORS 支持凭证
-    CORS(app, supports_credentials=True, origins=['http://localhost:3000'])
+    CORS(app, supports_credentials=True, origins=[
+        'http://localhost:3000',
+        'https://www.example.com'
+    ])
     
     db.init_app(app)
     login_manager.init_app(app)
