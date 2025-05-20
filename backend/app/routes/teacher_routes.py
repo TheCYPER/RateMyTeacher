@@ -49,6 +49,25 @@ def init_teacher_routes(app):
             'review_count': len(teacher.ratings)
         } for teacher in teachers])
     
+    # 搜索教师
+    @app.route('/api/teachers/search', methods=['GET'])
+    def search_teachers():
+        query = request.args.get('q', '')
+        if not query:
+            return jsonify([])
+            
+        teachers = Teacher.query.filter(
+            Teacher.name.ilike(f'%{query}%') | 
+            Teacher.department.ilike(f'%{query}%')
+        ).all()
+        
+        return jsonify([{
+            'id': t.id,
+            'name': t.name,
+            'department': t.department,
+            'review_count': len(t.ratings)
+        } for t in teachers])
+    
     # 教师评价统计接口
     @app.route('/api/teachers/<int:teacher_id>/stats', methods=['GET'])
     def get_teacher_stats(teacher_id):
