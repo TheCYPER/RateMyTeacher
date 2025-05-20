@@ -15,9 +15,11 @@ import axios from 'axios'
 // Composables
 import { createApp } from 'vue'
 
+import { API_BASE_URL } from './config'
+
 // 配置 axios
-axios.defaults.baseURL = 'http://localhost:8000'
-axios.defaults.withCredentials = true  // 允许跨域请求携带凭证
+axios.defaults.baseURL = API_BASE_URL
+axios.defaults.withCredentials = true
 
 const app = createApp(App)
 
