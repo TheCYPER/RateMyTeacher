@@ -13,7 +13,8 @@ def create_app():
     # 配置 CORS 支持凭证
     CORS(app, supports_credentials=True, origins=[
         'http://localhost:3000',
-        'lighthearted-biscochitos-c101a0.netlify.app'
+        'http://localhost:8080',
+        'https://lighthearted-biscochitos-c101a0.netlify.app'  # 您的 Netlify 域名
     ])
     
     db.init_app(app)
@@ -31,7 +32,23 @@ def create_app():
     from .ai_part import init_ai_routes
     init_ai_routes(app)  # 初始化AI路由
 
+    # 初始化数据库
     with app.app_context():
-        db.create_all()  # 自动创建数据库表
+        try:
+            from app.models import User, Teacher, Review
+            # 检查数据库是否为空
+            if User.query.count() == 0:
+                print("数据库为空，开始生成测试数据...")
+                from generate_test_data import main
+                main()
+                print("测试数据生成完成！")
+            else:
+                print(f"数据库中已有 {User.query.count()} 个用户")
+                print(f"数据库中已有 {Teacher.query.count()} 个教师")
+                print(f"数据库中已有 {Review.query.count()} 条评价")
+        except Exception as e:
+            print(f"初始化数据库时出错: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
 
     return app
