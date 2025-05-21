@@ -35,6 +35,10 @@ def create_app():
     # 初始化数据库
     with app.app_context():
         try:
+            # 首先创建所有表
+            db.create_all()
+            print("数据库表创建成功")
+            
             from app.models import User, Teacher, Review
             # 检查数据库是否为空
             if User.query.count() == 0:
