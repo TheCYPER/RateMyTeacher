@@ -11,13 +11,21 @@ fake = Faker('zh_CN')
 def generate_users(num_users=50):
     """生成测试用户数据"""
     users = []
+    used_usernames = set()  # 用于跟踪已使用的用户名
+    
     for _ in range(num_users):
-        user = User(
-            username=fake.user_name(),
-            school=fake.company(),
-            password_hash=fake.password()
-        )
-        users.append(user)
+        while True:
+            username = fake.user_name()
+            if username not in used_usernames:  # 确保用户名唯一
+                used_usernames.add(username)
+                user = User(
+                    username=username,
+                    school=fake.company(),
+                    password_hash=fake.password()
+                )
+                users.append(user)
+                break
+    
     return users
 
 def generate_teachers(num_teachers=30):
@@ -66,34 +74,40 @@ def main():
     app = create_app()
     
     with app.app_context():
-        # 清空现有数据
-        print("清空现有数据...")
-        Review.query.delete()
-        Teacher.query.delete()
-        User.query.delete()
-        db.session.commit()
-        
-        # 生成并添加用户数据
-        print("生成用户数据...")
-        users = generate_users()
-        db.session.add_all(users)
-        db.session.commit()
-        
-        # 生成并添加教师数据
-        print("生成教师数据...")
-        teachers = generate_teachers()
-        db.session.add_all(teachers)
-        db.session.commit()
-        
-        # 生成并添加评价数据
-        print("生成评价数据...")
-        reviews = generate_reviews(users, teachers)
-        db.session.add_all(reviews)
-        db.session.commit()
-        
-        print(f"成功添加 {len(users)} 个用户")
-        print(f"成功添加 {len(teachers)} 个教师")
-        print(f"成功添加 {len(reviews)} 条评价")
+        try:
+            # 清空现有数据
+            print("清空现有数据...")
+            Review.query.delete()
+            Teacher.query.delete()
+            User.query.delete()
+            db.session.commit()
+            
+            # 生成并添加用户数据
+            print("生成用户数据...")
+            users = generate_users()
+            db.session.add_all(users)
+            db.session.commit()
+            
+            # 生成并添加教师数据
+            print("生成教师数据...")
+            teachers = generate_teachers()
+            db.session.add_all(teachers)
+            db.session.commit()
+            
+            # 生成并添加评价数据
+            print("生成评价数据...")
+            reviews = generate_reviews(users, teachers)
+            db.session.add_all(reviews)
+            db.session.commit()
+            
+            print(f"成功添加 {len(users)} 个用户")
+            print(f"成功添加 {len(teachers)} 个教师")
+            print(f"成功添加 {len(reviews)} 条评价")
+        except Exception as e:
+            print(f"生成测试数据时出错: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            db.session.rollback()  # 发生错误时回滚
 
 if __name__ == '__main__':
     main() 
