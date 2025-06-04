@@ -10,7 +10,7 @@ const isLoading = ref(false);
 const checkLoginStatus = async () => {
   try {
     isLoading.value = true;
-    const response = await axios.get('/protected');
+    const response = await axios.get('/protected', { withCredentials: true });
     if (response.data.message === '您已登录') {
       console.log('登录状态验证成功');
       return true;
@@ -32,7 +32,7 @@ const login = async (usernameValue, password) => {
     const response = await axios.post('/login', {
       username: usernameValue,
       password: password
-    });
+    }, { withCredentials: true });
 
     if (response.data.message === '登录成功') {
       // 更新全局登录状态
@@ -43,7 +43,10 @@ const login = async (usernameValue, password) => {
       username.value = usernameValue;
       
       // 验证登录状态
-      await checkLoginStatus();
+      const isValid = await checkLoginStatus();
+      if (!isValid) {
+        throw new Error('登录状态验证失败');
+      }
       
       // 触发登录状态变化事件
       window.dispatchEvent(new CustomEvent('loginStateChanged', {
@@ -58,6 +61,7 @@ const login = async (usernameValue, password) => {
     return false;
   } catch (error) {
     console.error('Login error:', error);
+    logout(); // 登录失败时清除状态
     return false;
   } finally {
     isLoading.value = false;
@@ -83,7 +87,10 @@ const logout = () => {
 // 初始化时检查登录状态
 onMounted(async () => {
   if (isLoggedIn.value) {
-    await checkLoginStatus();
+    const isValid = await checkLoginStatus();
+    if (!isValid) {
+      logout();
+    }
   }
 });
 

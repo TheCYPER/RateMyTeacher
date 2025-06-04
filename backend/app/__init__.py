@@ -12,11 +12,15 @@ def create_app():
     app.config.from_object('config.Config')
     
     # 配置 CORS 支持凭证
-    CORS(app, supports_credentials=True, origins=[
-        'http://localhost:3000',
-        'http://localhost:8080',
-        'https://lighthearted-biscochitos-c101a0.netlify.app'
-    ])
+    CORS(app, 
+         supports_credentials=True, 
+         origins=[
+             'http://localhost:3000',
+             'http://localhost:8080',
+             'https://lighthearted-biscochitos-c101a0.netlify.app'
+         ],
+         allow_headers=['Content-Type', 'Authorization'],
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
     
     db.init_app(app)
     login_manager.init_app(app)
