@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, session
 from flask_login import login_user, login_required, current_user
 from app import db
 from app.models import User
@@ -29,15 +29,30 @@ def init_user_routes(app):
         user = User.query.filter_by(username=data['username']).first()
 
         if user and user.check_password(data['password']):
-            login_user(user)
-            return jsonify({'message': '登录成功'})
+            login_user(user, remember=True)  # 添加 remember=True
+            session.permanent = True  # 设置会话持久化
+            return jsonify({
+                'message': '登录成功',
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'school': user.school
+                }
+            })
         return jsonify({'error': '用户名或密码错误'}), 401
 
     # 测试保护接口
     @app.route('/protected')
     @login_required  # 确保用户已登录
     def protected():
-        return jsonify({'message': '您已登录'}) 
+        return jsonify({
+            'message': '您已登录',
+            'user': {
+                'id': current_user.id,
+                'username': current_user.username,
+                'school': current_user.school
+            }
+        })
 
     # 获取用户信息
     @app.route('/api/user/<int:user_id>', methods=['GET'])
