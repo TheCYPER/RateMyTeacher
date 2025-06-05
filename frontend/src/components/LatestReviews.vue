@@ -86,31 +86,33 @@ export default {
         const isValid = await this.checkLoginStatus();
         if (!isValid) {
           alert('登录已过期，请重新登录');
+          this.$router.push('/login');
           return;
         }
         
         if (this.userReactions[review.id] === 'like') {
           // 如果已经点赞，则取消点赞
-          const response = await axios.post(`/api/reviews/${review.id}/unlike`)
-          review.likes = response.data.likes
-          this.userReactions[review.id] = null
+          const response = await axios.post(`/api/reviews/${review.id}/unlike`, {}, { withCredentials: true });
+          review.likes = response.data.likes;
+          this.userReactions[review.id] = null;
         } else {
           // 如果已经点踩，则取消点踩并点赞
           if (this.userReactions[review.id] === 'dislike') {
-            const undislikeResponse = await axios.post(`/api/reviews/${review.id}/undislike`)
-            review.dislikes = undislikeResponse.data.dislikes
+            const undislikeResponse = await axios.post(`/api/reviews/${review.id}/undislike`, {}, { withCredentials: true });
+            review.dislikes = undislikeResponse.data.dislikes;
           }
-          const response = await axios.post(`/api/reviews/${review.id}/like`)
-          review.likes = response.data.likes
-          this.userReactions[review.id] = 'like'
+          const response = await axios.post(`/api/reviews/${review.id}/like`, {}, { withCredentials: true });
+          review.likes = response.data.likes;
+          this.userReactions[review.id] = 'like';
         }
       } catch (err) {
-        console.error('点赞失败:', err)
+        console.error('点赞失败:', err);
         if (err.response && err.response.status === 401) {
           alert('请先登录后再点赞');
+          this.$router.push('/login');
         } else {
           // 恢复原状态
-          this.fetchLatestReviews()
+          this.fetchLatestReviews();
         }
       }
     },

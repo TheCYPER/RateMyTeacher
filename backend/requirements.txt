@@ -8,10 +8,12 @@ flask-cors==5.0.1
 Flask-JWT-Extended==4.7.1
 Flask-Login==0.6.3
 Flask-SQLAlchemy==3.1.1
+gunicorn==23.0.0
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.6
 MarkupSafe==3.0.2
+packaging==25.0
 PyJWT==2.10.1
 repoze.lru==0.7
 requests==2.32.3
