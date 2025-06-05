@@ -4,6 +4,12 @@ from faker import Faker
 from app import create_app, db
 from app.models import User, Teacher, Review
 import config
+import openai
+import os
+
+# 设置OpenAI配置
+openai.api_base = config.Config.OPENAI_BASE_URL
+openai.api_key = config.Config.OPENAI_API_KEY
 
 # 初始化 Faker
 fake = Faker('zh_CN')
@@ -50,27 +56,67 @@ def generate_teachers(num_teachers=30):
         teachers.append(teacher)
     return teachers
 
+def generate_ai_review(teacher_name, department, score):
+    """使用AI生成评价内容"""
+    prompt = f"""请生成一条对{department}的{teacher_name}老师的评价。
+评分是{score}分（满分5分）。
+请根据评分生成相应的评价内容：
+- 5分：非常满意，突出老师的优点
+- 4分：比较满意，有少量建议
+- 3分：一般，有优点也有不足
+- 2分：不太满意，主要说明不足
+- 1分：非常不满意，详细说明问题
+
+请生成一条真实的、具体的评价，包含具体的教学场景或例子。评价长度在50-100字之间。"""
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "你是一个学生，正在评价自己的老师。"},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"AI生成评价时出错: {str(e)}")
+        return fake.text(max_nb_chars=200)  # 如果AI生成失败，使用Faker生成随机文本
+
 def generate_reviews(users, teachers, num_reviews=200):
     """生成测试评价数据"""
     reviews = []
-    for _ in range(num_reviews):
-        # 随机选择一个用户和教师
-        user = random.choice(users)
-        teacher = random.choice(teachers)
-        
-        # 生成评价内容
-        review = Review(
-            score=random.randint(1, 5),
-            comment=fake.text(max_nb_chars=200),
-            teacher_name=teacher.name,
-            department=teacher.department,
-            user_id=user.id,
-            teacher_id=teacher.id,
-            created_at=fake.date_time_between(start_date='-1y', end_date='now'),
-            likes=random.randint(0, 50),
-            dislikes=random.randint(0, 20)
-        )
-        reviews.append(review)
+    
+    # 定义评分分布
+    score_distribution = {
+        5: 50,  # 50条5分评价
+        4: 30,  # 30条4分评价
+        3: 10,  # 10条3分评价
+        2: 10,  # 10条2分评价
+        1: 10   # 10条1分评价
+    }
+    
+    for score, count in score_distribution.items():
+        for _ in range(count):
+            # 随机选择一个用户和教师
+            user = random.choice(users)
+            teacher = random.choice(teachers)
+            
+            # 使用AI生成评价内容
+            comment = generate_ai_review(teacher.name, teacher.department, score)
+            
+            review = Review(
+                score=score,
+                comment=comment,
+                teacher_name=teacher.name,
+                department=teacher.department,
+                user_id=user.id,
+                teacher_id=teacher.id,
+                created_at=fake.date_time_between(start_date='-1y', end_date='now'),
+                likes=random.randint(0, 50),
+                dislikes=random.randint(0, 20)
+            )
+            reviews.append(review)
+    
     return reviews
 
 def main():

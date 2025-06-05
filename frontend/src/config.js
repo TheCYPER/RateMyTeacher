@@ -1,1 +1,2 @@
-export const API_BASE_URL = 'https://ratemyteacher-t929.onrender.com'
+// 使用环境变量中的API地址
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'

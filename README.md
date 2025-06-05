@@ -96,6 +96,82 @@ npm install
 npm run serve
 ```
 
+### 环境变量配置
+
+#### 开发环境
+1. 复制 `.env.example` 为 `.env`
+2. 修改 `.env` 中的配置值
+
+#### 生产环境
+在服务器上设置以下环境变量：
+
+```bash
+# Flask配置
+export FLASK_ENV=production
+export FLASK_APP=run.py
+
+# OpenAI配置
+export OPENAI_BASE_URL=your_openai_base_url
+export OPENAI_API_KEY=your_openai_api_key
+
+# 数据库配置
+export DATABASE_URL=your_database_url
+
+# 安全配置
+export SECRET_KEY=your_secret_key
+
+# API配置
+export FRONTEND_URL=your_frontend_url
+export BACKEND_URL=your_backend_url
+```
+
+### 开发环境设置
+
+#### 后端
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或
+venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+flask run
+```
+
+#### 前端
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### 生产环境部署
+
+#### 后端
+1. 设置所有必要的环境变量
+2. 使用生产级WSGI服务器（如Gunicorn）运行应用
+```bash
+gunicorn -w 4 -b 0.0.0.0:5000 "app:create_app('production')"
+```
+
+#### 前端
+1. 构建生产版本
+```bash
+cd frontend
+npm run build
+```
+2. 将 `dist` 目录部署到Web服务器
+
+## 分支管理
+- `development`: 开发分支
+- `release/deployment`: 部署分支
+- `main`: 主分支
+
+## 开发流程
+1. 在 `development` 分支进行开发
+2. 完成功能后合并到 `release/deployment`
+3. 测试通过后合并到 `main`
+
 ## 使用方法 | Usage
 
 1. **注册/登录** | **Register/Login**

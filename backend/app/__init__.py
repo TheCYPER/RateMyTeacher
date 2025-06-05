@@ -2,25 +2,36 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_cors import CORS
+import os
+from config import config
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 _db_initialized = False  # 添加标志
 
-def create_app():
-    app = Flask(__name__)
-    app.config.from_object('config.Config')
+def create_app(config_name=None):
+    if config_name is None:
+        config_name = os.getenv('FLASK_ENV', 'development')
     
-    # 配置 CORS 支持凭证
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    
+    # 配置 CORS
+    allowed_origins = [
+        'http://localhost:3000',  # Vite默认端口
+        'http://localhost:8080',  # 备用端口
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:8080',
+        app.config['FRONTEND_URL']  # 从配置中获取前端URL
+    ]
+    
     CORS(app, 
-         supports_credentials=True, 
-         origins=[
-             'http://localhost:3000',
-             'http://localhost:8080',
-             'https://lighthearted-biscochitos-c101a0.netlify.app'
-         ],
-         allow_headers=['Content-Type', 'Authorization'],
-         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+         resources={r"/api/*": {
+             "origins": allowed_origins,
+             "supports_credentials": True,
+             "allow_headers": ["Content-Type", "Authorization"],
+             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+         }})
     
     db.init_app(app)
     login_manager.init_app(app)
